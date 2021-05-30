@@ -1,4 +1,4 @@
-const CONTRACT_NAME = process.env.CONTRACT_NAME || 'guest-book.testnet';
+const CONTRACT_NAME = process.env.CONTRACT_NAME || 'b4oshany.testnet';
 
 function getConfig(env) {
   switch(env) {
@@ -39,6 +39,11 @@ function getConfig(env) {
         contractName: CONTRACT_NAME
       };
     case 'test':
+    case 'contractMethods':
+      return {
+        viewMethods: ['getMessages', 'getReferralAccountId'],
+        changeMethods: ['addMessage', 'addReferralKey']
+      };
     case 'ci':
       return {
         networkId: 'shared-test',

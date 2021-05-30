@@ -1,4 +1,4 @@
-import { PostedMessage, messages } from './model';
+import { PostedMessage, messages, ReferralAccount, referralByPubKey } from './model';
 
 // --- contract code goes below
 
@@ -29,4 +29,20 @@ export function getMessages(): PostedMessage[] {
     result[i] = messages[i + startIndex];
   }
   return result;
+}
+
+
+
+// method for owner
+export function getReferralAccountId(public_key: string): string {
+  const refAccount = referralByPubKey.get(public_key);
+  if ( ! refAccount ) {
+    return '';
+  }
+  return refAccount.account_id;
+}
+
+export function addReferralKey(account_id: string, public_key: string, amount: string): void {
+  const refAccount = new ReferralAccount(account_id, amount);
+  referralByPubKey.set(public_key, refAccount);
 }
