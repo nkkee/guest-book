@@ -32,6 +32,7 @@ export default function Form({ onSubmit, currentUser }) {
         <button type="submit">
           Sign
         </button>
+      
       </fieldset>
     </form>
   );

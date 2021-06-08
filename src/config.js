@@ -41,8 +41,8 @@ function getConfig(env) {
     case 'test':
     case 'contractMethods':
       return {
-        viewMethods: ['getMessages', 'getReferralAccountId'],
-        changeMethods: ['addMessage', 'addReferralKey']
+        viewMethods: ['getMessages', 'getReferralAccountId', 'getAccountPoints'],
+        changeMethods: ['addMessage', 'addReferralKey', 'signBookWithGuestKey']
       };
     case 'ci':
       return {

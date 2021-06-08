@@ -1,4 +1,4 @@
-import { context, u128, PersistentVector, PersistentMap } from "near-sdk-as";
+import { context, u128, PersistentVector, PersistentMap, MapEntry } from "near-sdk-as";
 
 /** 
  * Exporting a new class PostedMessage so it can be used outside of this file.
@@ -21,23 +21,33 @@ export class PostedMessage {
 export const messages = new PersistentVector<PostedMessage>("m");
 
 
-
-
-
 /** 
  * Exporting a new class PostedMessage so it can be used outside of this file.
  */
  @nearBindgen
  export class ReferralAccount {
-   sender: string;
+   sender: string; 
    constructor(public account_id: string, public amount: string) {
      this.sender = context.sender;
    }
  }
+
+ @nearBindgen
+ export class AccountPoints {
+   
+   constructor(public points: u16, public senders: Array<string>) {
+   }
+ }
+
+
+
  /**
   * collections.vector is a persistent collection. Any changes to it will
   * be automatically saved in the storage.
   * The parameter to the constructor needs to be unique across a single contract.
   * It will be used as a prefix to all keys required to store data in the storage.
   */
- export const referralByPubKey = new PersistentMap<string, ReferralAccount>("ReferralLink");
+ export const referralByPubKey = new PersistentMap<string, string>("ReferralLink");
+
+ 
+ export const accountPoints = new PersistentMap<string, AccountPoints>("Points");

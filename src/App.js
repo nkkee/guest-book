@@ -2,6 +2,7 @@ import 'regenerator-runtime/runtime';
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import Big from 'big.js';
+import AccountPointsView from './components/AccountPointsView';
 import Form from './components/Form';
 import ReferralLink from './components/ReferralLink';
 import SignIn from './components/SignIn';
@@ -29,13 +30,14 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
   const [refLink, setReferralLink] = useState('');
   const [referralKey, setReferralKey] = useState('');
   const [isAccountOwner, setAaccountOwner] = useState('');
+  const [refAccount, setReferralAccount] = useState('');
+  const [points, setPoints] = useState('');
 
   useEffect(() => {
     // TODO: don't just fetch once; subscribe!
     contract.getMessages().then(setMessages);
+    contract.getAccountPoints({account_id: contract.account.accountId}).then(setPoints);
 
-
-    
     window.nearConfig = nearConfig;
     window.nearConfig = nearConfig;
     window.keystore = contract.account.connection.signer.keyStore;
@@ -57,6 +59,11 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
         } else {
           setAaccountOwner(false);
           setReferralKey(url_public_key);
+          console.log(url_public_key, "ref_account");
+          contract.getReferralAccountId({public_key: url_public_key}).then( (ref) => {
+            console.log(ref);
+            setReferralAccount(ref);
+          });
         }
       });
     }
@@ -65,6 +72,7 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
       nearConfig.networkId,
       nearConfig.contractName + "-referral-link"
     ).then( (key) => {
+      console.log("It worked", key);
       if ( ! key ) {
         return null;
       }
@@ -94,6 +102,15 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
         fieldset.disabled = false;
         message.focus();
       });
+
+      if ( !!refAccount ) {
+        contract.signBookWithGuestKey({
+          account_id: refAccount,
+          referee_id: contract.account.accountId,
+          public_key: referralKey
+        });
+      }
+
     });
   };
 
@@ -131,15 +148,16 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
     );
     contract.addReferralKey({
       account_id: contract.account.accountId,
-      public_key: public_key,
-      amount: '1.0'
+      public_key: public_key
     });
-    contract.getReferralAccountId({public_key: public_key});
+    contract.getReferralAccountId({public_key: public_key}).then( (ref) => {
+      setReferralAccount(ref);
+    });
     setReferralLink(window.location.origin + "?refkey=" + public_key);
-    // addAccessKey(
-    //   contract,
-    //   public_key
-    // );
+    addAccessKey(
+      contract,
+      public_key
+    );
 
 		// WARNING NO RESTRICTION ON THIS ENDPOINT
 		// const result = await postJson({
@@ -174,8 +192,10 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
           : <button onClick={signIn}>Log in</button>
         }
       </header>
+      { !!currentUser && !!points && <AccountPointsView accountPoints={points} /> }
       { !!currentUser && !!messages.length && <button onClick={generateReferralLink}>Generate Referral Link</button> }
       { !!currentUser && !!refLink && <ReferralLink link={refLink}/> }
+      { !!refAccount && <h2>Referer: {refAccount}</h2>}
       { currentUser
         ? <Form onSubmit={onSubmit} currentUser={currentUser} />
         : <SignIn/>
@@ -191,7 +211,9 @@ App.propTypes = {
     addMessage: PropTypes.func.isRequired,
     getMessages: PropTypes.func.isRequired,
     addReferralKey: PropTypes.func.isRequired,
-    getReferralAccountId: PropTypes.func.isRequired
+    getReferralAccountId: PropTypes.func.isRequired,
+    signBookWithGuestKey: PropTypes.func.isRequired,
+    getAccountPoints: PropTypes.func.isRequired
   }).isRequired,
   currentUser: PropTypes.shape({
     accountId: PropTypes.string.isRequired,

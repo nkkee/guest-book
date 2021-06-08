@@ -124,3 +124,16 @@ button {
   padding-left: 0.25em;
   margin-left: -0.5em;
 }
+
+.referees {
+
+  margin-bottom: 20px;
+  
+  .content {
+    padding: 0 18px;
+    overflow: scroll;
+    background-color: #f1f1f1;
+    height: 200px;
+    width: 100%;
+  }
+}

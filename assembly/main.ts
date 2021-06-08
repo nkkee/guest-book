@@ -1,4 +1,4 @@
-import { PostedMessage, messages, ReferralAccount, referralByPubKey } from './model';
+import { PostedMessage, messages, referralByPubKey, AccountPoints, accountPoints} from './model';
 
 // --- contract code goes below
 
@@ -34,15 +34,38 @@ export function getMessages(): PostedMessage[] {
 
 
 // method for owner
-export function getReferralAccountId(public_key: string): string {
+export function getReferralAccountId(public_key: string): string  | null {
   const refAccount = referralByPubKey.get(public_key);
   if ( ! refAccount ) {
     return '';
   }
-  return refAccount.account_id;
+  return refAccount;
 }
 
-export function addReferralKey(account_id: string, public_key: string, amount: string): void {
-  const refAccount = new ReferralAccount(account_id, amount);
-  referralByPubKey.set(public_key, refAccount);
+export function addReferralKey(account_id: string, public_key: string): void {
+  referralByPubKey.set(public_key, account_id);
+}
+
+
+export function getAccountPoints(account_id: string): AccountPoints {
+  var ap = accountPoints.get(account_id);
+  if ( ! ap ) {
+    return new AccountPoints(0, new Array<string>());
+  }
+  return ap;
+}
+
+export function signBookWithGuestKey(account_id: string, referee_id: string, public_key: string): void {
+
+  if ( account_id != referee_id ) {
+    var ap = accountPoints.get(account_id);
+    if ( ! ap ) {
+      ap = new AccountPoints(1, new Array<string>());
+    } else {
+      ap = new AccountPoints(ap.points + 1, ap.senders);
+    }
+    ap.senders.push(referee_id);
+    accountPoints.set(account_id, ap);
+
+  }
 }

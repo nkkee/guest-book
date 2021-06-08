@@ -55,3 +55,4 @@ window.nearInitPromise = initContract()
       document.getElementById('root')
     );
   });
+
