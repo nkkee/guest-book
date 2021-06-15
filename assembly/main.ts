@@ -33,7 +33,11 @@ export function getMessages(): PostedMessage[] {
 
 
 
-// method for owner
+/**
+ * Get the account Id for the given public key.
+ * @param public_key  Base58 public key
+ * @returns string | null
+ */
 export function getReferralAccountId(public_key: string): string  | null {
   const refAccount = referralByPubKey.get(public_key);
   if ( ! refAccount ) {
@@ -42,23 +46,42 @@ export function getReferralAccountId(public_key: string): string  | null {
   return refAccount;
 }
 
+
+/**
+ * Add referral key to the referrer account.
+ * @param account_id 
+ * @param public_key 
+ */
 export function addReferralKey(account_id: string, public_key: string): void {
   referralByPubKey.set(public_key, account_id);
 }
 
 
+/**
+ * Get the referral points earned by the given referrer
+ * @param account_id  The account id for referrer.
+ * @returns AccountPoints
+ */
 export function getAccountPoints(account_id: string): AccountPoints {
-  var ap = accountPoints.get(account_id);
+  const ap = accountPoints.get(account_id);
   if ( ! ap ) {
     return new AccountPoints(0, new Array<string>());
   }
   return ap;
 }
 
+
+/**
+ * Sign guest book with the given referrer public key.
+ * Each time the guest book is signed by the referrer's public key, the referrer earns 1 point.
+ * @param account_id  Referrer account Id.
+ * @param referee_id  Referrer Id
+ * @param public_key  Referrer public key.
+ */
 export function signBookWithGuestKey(account_id: string, referee_id: string, public_key: string): void {
 
   if ( account_id != referee_id ) {
-    var ap = accountPoints.get(account_id);
+    let ap = accountPoints.get(account_id);
     if ( ! ap ) {
       ap = new AccountPoints(1, new Array<string>());
     } else {
@@ -66,6 +89,5 @@ export function signBookWithGuestKey(account_id: string, referee_id: string, pub
     }
     ap.senders.push(referee_id);
     accountPoints.set(account_id, ap);
-
   }
 }

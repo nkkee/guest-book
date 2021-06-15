@@ -22,16 +22,10 @@ export const messages = new PersistentVector<PostedMessage>("m");
 
 
 /** 
- * Exporting a new class PostedMessage so it can be used outside of this file.
+ * Exporting a new class AccountPoints so it can be used outside of this file.
+ * This class is used to track the points accumulated by the referer for each 
+ * referral.
  */
- @nearBindgen
- export class ReferralAccount {
-   sender: string; 
-   constructor(public account_id: string, public amount: string) {
-     this.sender = context.sender;
-   }
- }
-
  @nearBindgen
  export class AccountPoints {
    
@@ -40,9 +34,8 @@ export const messages = new PersistentVector<PostedMessage>("m");
  }
 
 
-
  /**
-  * collections.vector is a persistent collection. Any changes to it will
+  * collections.map is a persistent collection. Any changes to it will
   * be automatically saved in the storage.
   * The parameter to the constructor needs to be unique across a single contract.
   * It will be used as a prefix to all keys required to store data in the storage.
@@ -50,4 +43,10 @@ export const messages = new PersistentVector<PostedMessage>("m");
  export const referralByPubKey = new PersistentMap<string, string>("ReferralLink");
 
  
+ /**
+  * collections.map is a persistent collection. Any changes to it will
+  * be automatically saved in the storage.
+  * The parameter to the constructor needs to be unique across a single contract.
+  * It will be used as a prefix to all keys required to store data in the storage.
+  */
  export const accountPoints = new PersistentMap<string, AccountPoints>("Points");

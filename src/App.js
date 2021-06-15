@@ -9,15 +9,10 @@ import SignIn from './components/SignIn';
 import Messages from './components/Messages';
 import * as nearAPI from 'near-api-js';
 
-import { 
-	// contractName,
-	// createAccessKeyAccount,
+import {
   addAccessKey,
   getAccessKeyFromURL,
-  hasAccessKey,
-  checkAccessKey,
-	postJson,
-	// postSignedJson
+  hasAccessKey
 } from './near-utils';
 
 const KeyPair = nearAPI.utils.KeyPairEd25519;
@@ -37,21 +32,8 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
     // TODO: don't just fetch once; subscribe!
     contract.getMessages().then(setMessages);
     contract.getAccountPoints({account_id: contract.account.accountId}).then(setPoints);
-
-    window.nearConfig = nearConfig;
-    window.nearConfig = nearConfig;
-    window.keystore = contract.account.connection.signer.keyStore;
-    window.nearAPI = nearAPI;
-    window.wallet = wallet;
-    window.contract = contract;
-    window.nearConfig = nearConfig;
-    // nearConfig.contractName + "-referral-link"
-
     const url_public_key = getAccessKeyFromURL();
 
-    
-    window.getAccessKeyFromURL = getAccessKeyFromURL;
-    window.hasAccessKey = hasAccessKey;
     if ( url_public_key ) {
       hasAccessKey(contract.account, url_public_key).then( (status) => {
         if ( status ) {
@@ -127,19 +109,9 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
   };
 
   const generateReferralLink = async () => {
-    // console.log(contract);
-    // console.log(KeyPair.fromRandom());
-    // const key1 = nearAPI.KeyPair.fromRandom();
     const keyPair = KeyPair.fromRandom();
-    // console.log(keyPair);
     const public_key = keyPair.publicKey.toString();
 		implicitAccountId = Buffer.from(keyPair.publicKey.data).toString('hex');
-    // const contractName = contract.account.accountId;
-    // console.log(wallet);
-    // console.log(nearConfig)
-    // window.wallet = wallet;
-    // window.contract = contract;
-    // window.nearConfig = nearConfig;
     
     contract.account.connection.signer.keyStore.setKey(
       nearConfig.networkId,
@@ -158,28 +130,6 @@ const App = ({ contract, currentUser, nearConfig, wallet }) => {
       contract,
       public_key
     );
-
-		// WARNING NO RESTRICTION ON THIS ENDPOINT
-		// const result = await postJson({
-		// 	url: `${nearConfig.walletUrl}/add-key`,
-		// 	data: { publicKey: keyPair.publicKey.toString() }
-    // });
-
-		// if (result && result.success) {
-		// 	const isValid = await checkAccessKey(keyPair);
-		// 	if (isValid) {
-    //     contract.account.connection.signer.keyStore.setKey(
-    //       nearConfig.networkId,
-    //       nearConfig.contractName + "-referral-link",
-    //       keyPair
-    //     );
-    //     setReferralLink(window.location.origin + "?refkey=" + key.publicKey.toString());
-		// 	}
-		// }
-		return null;
-
-    setReferralLink(window.location.origin + "/reflink/" + public_key);
-
   }
 
 
